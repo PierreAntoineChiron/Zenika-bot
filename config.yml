@@ -1,11 +1,11 @@
 # The config recipe.
 # https://rasa.com/docs/rasa/model-configuration/
 #recipe: default.v1
-
+ 
 # Configuration for Rasa NLU.
 # https://rasa.com/docs/rasa/nlu/components/
 language: fr
-  
+
 pipeline:
   - name: WhitespaceTokenizer
   - name: RegexFeaturizer

@@ -9,7 +9,6 @@ nlu:
     - Bonsoir
     - hey
 
-
 - intent: goodbye
   examples: |
     - A plus
@@ -36,7 +35,7 @@ nlu:
     - Je cherche un formateur [Angular](skill)
     - un formateur en [Cloud](skill) svp 
     - Qui est la personne la plus compétente en [Apache Kafka](skill)
-    - Un contact pour apprendre [C](skill)
+    - Un contact pour apprendre [C++](skill)
     - formateur [java](skill) à [Lille](agence)?
     - Qui peut m'aider en [jira](skill)
     - J'ai un problème [github](skill)

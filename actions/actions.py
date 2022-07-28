@@ -16,52 +16,42 @@ class ActionTrainerSearch(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> Any:
         skill = tracker.get_slot("skill") #Récupère l'entité "skill" repérée par le bot
-        agence = tracker.get_slot("agence") #Récupère l'entité "agence" repérée par le bot
-        print (skill)
-        print (agence)
+        #print (skill)
+        
         df = pd.read_csv('bdd/Export Skillz 2022-06-27 - Feuille 1.csv', sep=',', encoding='utf-8')
         df.columns = df.columns.str.strip() #Enleve les espaces en "bord" de chaque colonne du dataframe
         
-        df_collaborator_agency_name=df['collaborator_agency_name']
         mask2= df['skill_level']>3 #Masque pour que seules les compétences de niveau 4 ou 5 des utilisateurs soient retenues
         
-                
+        #Reste à voir comment récupérer les caractères spéciaux comme (+,#,>,<) Tokenizer personalisé mais il faut arriver à le connecter au code
+        
         if (skill):
             print (skill)
             df_skill_name = df['skill_name']
             mask1 = (df_skill_name).str.casefold() == skill.casefold()
             df_trainers_skill=df[(mask1 & mask2)]
-            
-        if (agence):
-            print (agence)
-            mask3 = df_collaborator_agency_name.str.casefold() == agence.casefold()
-            df_trainers_agence=df[(mask2 & mask3)]
         
-        emails = False
-        emails_agence_skill= False
-        if (not skill and not agence):
+        
+        if (not skill):
             dispatcher.utter_message(" Nous n'avons pas compris votre demande. Veuillez la préciser en ajoutant la compétence recherchée ainsi que l'agence")
 
         elif (skill):
             if (len(df_trainers_skill)==0 ):
                 dispatcher.utter_message(" Nous sommes désolés, nous n'avons pas de formateur {}".format(skill))
             else:
-                if (agence):
-                    df_trainers_emails= df_trainers_skill['collaborator_email'].drop_duplicates(keep='first').values.tolist()
-                    emails= True
-                    emails_agence_skill = True
-                    dispatcher.utter_message(" Vous pouvez contacter l'une de ces adresses pour apprendre {}".format(skill))
-                else:
-                    df_trainers_emails= df_trainers_skill['collaborator_email'].drop_duplicates(keep='first').values.tolist()
-                    emails= True
-                    dispatcher.utter_message(" Vous pouvez contacter l'une de ces adresses pour apprendre {}".format(skill))
+                df_trainers_emails = df_trainers_skill['collaborator_email'].drop_duplicates(keep='first').values.tolist()
+                df_trainers_agency_name = df_trainers_skill['collaborator_agency_name'].values.tolist()
+                
+                #Nouvelle liste contenant skill + agence du collaborateur
+                df_trainers_skill_and_agency = [(df_trainers_emails[i], df_trainers_agency_name[i]) \
+                    for i in range(len(df_trainers_emails))]
+                
+                #emails_agence_skill = True
+                dispatcher.utter_message(" Vous pouvez contacter l'une de ces adresses pour apprendre {}".format(skill))
+                
+                #Envoie du message avec le mail et l'agence
+                for trainer in df_trainers_skill_and_agency:
+                    dispatcher.utter_message ( "{}".format(trainer[0]) +" à : l'agence de {}".format(trainer[1]))
 
-        if(emails):
-            for trainer_email in df_trainers_emails:
-                dispatcher.utter_message ( "{}".format(trainer_email))
-        if(emails_agence_skill):
-            for trainer_email in df_trainers_emails:
-                dispatcher.utter_message ( "{}".format(trainer_email[0]) +" : formateur {}".format(trainer_email[1]))
-       
 
         return [AllSlotsReset()]
