@@ -2,10 +2,13 @@ import re
 from typing import Any, Dict, List, Text
 
 from rasa.nlu.tokenizers.tokenizer import Token, Tokenizer
-from rasa.nlu.training_data import Message
+from rasa.shared.nlu.training_data.message import Message
 from rasa.nlu.constants import TOKENS_NAMES, MESSAGE_ATTRIBUTES
+from rasa.engine.recipes.default_recipe import DefaultV1Recipe
 
-
+@DefaultV1Recipe.register(
+    [DefaultV1Recipe.ComponentType.MESSAGE_TOKENIZER], is_trainable=False
+)
 class CustomTokenizer(Tokenizer):
 
     provides = [TOKENS_NAMES[attribute] for attribute in MESSAGE_ATTRIBUTES]
